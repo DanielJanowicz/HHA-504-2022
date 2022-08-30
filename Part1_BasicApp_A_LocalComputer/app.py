@@ -4,7 +4,17 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return 'Hello world!'
+    return 'Hello Dan!'
+
+@app.route('/careers')
+def careers():
+    return 'THis is the career page!'
+
+@app.route('/dashboard')
+def dashboard():
+    return 'This is the website dashboard!'
+
+
 
 ## Note, if you want to run this app with the command `python app.py`, you need to add the following line to the end of the file
 ## so it can execute and stay running....
