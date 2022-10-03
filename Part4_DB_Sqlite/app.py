@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # create a function that will be called when the user accesses the root of the website
 def get_db_connection():
-    dir = os.getcwd() + '/patients.db'
+    dir = os.getcwd() + '\patients.db'
     print('dir:', dir)
     conn = sqlite3.connect(dir) # create a connection to the database
     conn.row_factory = sqlite3.Row # The line of code assigning sqlite3.Row to the row_factory of connection creates what some people call a 'dictionary cursor', - instead of tuples it starts returning 'dictionary' rows after fetchall or fetchone
