@@ -108,12 +108,12 @@ ndc_codes_1k = ndc_codes_1k.drop_duplicates(subset=['PRODUCTNDC'], keep='first')
 insertQuery = "INSERT INTO production_patients (mrn, first_name, last_name, zip_code, dob, gender, contact_mobile, contact_home) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
 
 for index, row in df_fake_patients.iterrows():
-    db_azure.execute(insertQuery, (row['mrn'], row['first_name'], row['last_name'], row['zip_code'], row['dob'], row['gender'], row['contact_mobile'], row['contact_home']))
+    # db_azure.execute(insertQuery, (row['mrn'], row['first_name'], row['last_name'], row['zip_code'], row['dob'], row['gender'], row['contact_mobile'], row['contact_home']))
     db_gcp.execute(insertQuery, (row['mrn'], row['first_name'], row['last_name'], row['zip_code'], row['dob'], row['gender'], row['contact_mobile'], row['contact_home']))
     print("inserted row: ", index)
 
 # # query dbs to see if data is there
-df_azure = pd.read_sql_query("SELECT * FROM production_patients", db_azure)
+# df_azure = pd.read_sql_query("SELECT * FROM production_patients", db_azure)
 df_gcp = pd.read_sql_query("SELECT * FROM production_patients", db_gcp)
 
 
@@ -131,16 +131,16 @@ insertQuery = "INSERT INTO production_conditions (icd10_code, icd10_description)
 startingRow = 0
 for index, row in icd10codesShort_1k.iterrows():
     startingRow += 1
-    db_azure.execute(insertQuery, (row['CodeWithSeparator'], row['ShortDescription']))
-    print("inserted row db_azure: ", index)
+    #db_azure.execute(insertQuery, (row['CodeWithSeparator'], row['ShortDescription']))
+    #print("inserted row db_azure: ", index)
     db_gcp.execute(insertQuery, (row['CodeWithSeparator'], row['ShortDescription']))
     print("inserted row db_gcp: ", index)
     ## stop once we have 50 rows
-    if startingRow == 50:
+    if startingRow == 10:
         break
 
 # query dbs to see if data is there
-df_azure = pd.read_sql_query("SELECT * FROM production_conditions", db_azure)
+#df_azure = pd.read_sql_query("SELECT * FROM production_conditions", db_azure)
 df_gcp = pd.read_sql_query("SELECT * FROM production_conditions", db_gcp)
 
 # ###### the above way is inefficient, but it works. 
@@ -172,11 +172,11 @@ insertQuery = "INSERT INTO production_medications (med_ndc, med_human_name) VALU
 medRowCount = 0
 for index, row in ndc_codes_1k.iterrows():
     medRowCount += 1
-    db_azure.execute(insertQuery, (row['PRODUCTNDC'], row['NONPROPRIETARYNAME']))
+    #db_azure.execute(insertQuery, (row['PRODUCTNDC'], row['NONPROPRIETARYNAME']))
     db_gcp.execute(insertQuery, (row['PRODUCTNDC'], row['NONPROPRIETARYNAME']))
     print("inserted row: ", index)
     ## stop once we have 50 rows
-    if medRowCount == 50:
+    if medRowCount == 10:
         break
 
 # ndc_codes_1k_moded = ndc_codes_1k.rename(columns={'PRODUCTNDC': 'med_ndc', 'NONPROPRIETARYNAME': 'med_human_name'})
@@ -188,7 +188,7 @@ for index, row in ndc_codes_1k.iterrows():
 # ndc_codes_1k_moded.to_sql('production_medications', con=db_gcp, if_exists='replace', index=False)
 
 # query dbs to see if data is there
-df_azure = pd.read_sql_query("SELECT * FROM production_medications", db_azure)
+#df_azure = pd.read_sql_query("SELECT * FROM production_medications", db_azure)
 df_gcp = pd.read_sql_query("SELECT * FROM production_medications", db_gcp)
 
 
@@ -199,8 +199,8 @@ df_gcp = pd.read_sql_query("SELECT * FROM production_medications", db_gcp)
 ##### now lets create some fake patient_conditions 
 
 # first, lets query production_conditions and production_patients to get the ids
-df_conditions = pd.read_sql_query("SELECT icd10_code FROM production_conditions", db_azure)
-df_patients = pd.read_sql_query("SELECT mrn FROM production_patients", db_azure)
+df_conditions = pd.read_sql_query("SELECT icd10_code FROM production_conditions", db_gcp)
+df_patients = pd.read_sql_query("SELECT mrn FROM production_patients", db_gcp)
 
 # create a dataframe that is stacked and give each patient a random number of conditions between 1 and 5
 df_patient_conditions = pd.DataFrame(columns=['mrn', 'icd10_code'])
@@ -221,7 +221,7 @@ print(df_patient_conditions)
 insertQuery = "INSERT INTO production_patient_conditions (mrn, icd10_code) VALUES (%s, %s)"
 
 for index, row in df_patient_conditions.iterrows():
-    db_azure.execute(insertQuery, (row['mrn'], row['icd10_code']))
+    db_gcp.execute(insertQuery, (row['mrn'], row['icd10_code']))
     print("inserted row: ", index)
 
 
@@ -235,8 +235,8 @@ for index, row in df_patient_conditions.iterrows():
 
 # first, lets query production_medications and production_patients to get the ids
 
-df_medications = pd.read_sql_query("SELECT med_ndc FROM production_medications", db_azure) 
-df_patients = pd.read_sql_query("SELECT mrn FROM production_patients", db_azure)
+df_medications = pd.read_sql_query("SELECT med_ndc FROM production_medications", db_gcp) 
+df_patients = pd.read_sql_query("SELECT mrn FROM production_patients", db_gcp)
 
 # create a dataframe that is stacked and give each patient a random number of medications between 1 and 5
 df_patient_medications = pd.DataFrame(columns=['mrn', 'med_ndc'])
@@ -257,11 +257,11 @@ print(df_patient_medications)
 insertQuery = "INSERT INTO production_patient_medications (mrn, med_ndc) VALUES (%s, %s)"
 
 for index, row in df_patient_medications.iterrows():
-    db_azure.execute(insertQuery, (row['mrn'], row['med_ndc']))
+    db_gcp.execute(insertQuery, (row['mrn'], row['med_ndc']))
     print("inserted row: ", index)
 
 
 
 ### try and insert a new row with a random mrn and a random icd10_code
-db_azure.execute(insertQuery, (random.randint(1, 1000000), random.choice(df_conditions['icd10_code'])))
+db_gcp.execute(insertQuery, (random.randint(1, 1000000), random.choice(df_conditions['icd10_code'])))
 ## what happens and why? 
