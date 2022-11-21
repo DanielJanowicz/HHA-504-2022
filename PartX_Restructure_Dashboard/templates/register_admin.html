@@ -74,25 +74,33 @@
     
 <main class="form-signin w-100 m-auto">
 
-  <form action="{{ url_for('register') }}" method="post">
-    <h1 class="h3 mb-3 fw-normal">Register Account</h1>
+  <form action="{{ url_for('register_admin') }}" method="post">
+    <h1 class="h3 mb-3 fw-normal">Admin Account</h1>
 
-    <!-- create new input with drop down selection for account type -->
-    <div class="form-floating">
-      <select class="form-select" id="account_type" name="account_type">
-        <option value="admin">Admin</option>
-        <option value="patient">Patient</option>
-      </select>
-      <label for="floatingSelect">User Type</label>
+
+    <div class="form-floating" style="padding: .2em">
+      <input type="email" class="form-control" id="email" name="email" required>
+      <label for="floatingInput">Email</label>
     </div>
 
-    <br />
+    <div class="form-floating" style="padding: .2em">
+      <input type="text" class="form-control" id="username" name="username" required>
+      <label for="floatingInput">Username</label>
+    </div>
 
+    <div class="form-floating" style="padding: .2em">
+      <input type="password" class="form-control" id="password" name="password" required>
+      <label for="floatingPassword">Password</label>
+    </div>
+
+    <div class="msg">{{ msg }}</div>
 
     <br />
     
     <div class="form-group">
-      <button class="btn btn-primary" type="submit" value="Next">Next</button>
+      <button class="btn btn-primary" type="submit" value="Register">Create Admin Account</button>
+      <!-- <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a> -->
+
     </div>
 
 
